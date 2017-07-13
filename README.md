@@ -261,3 +261,7 @@ be required.
 - `Localized timezone names`
 - `AjxTimezoneData.js`
 - `deploy-timezones` script
+
+
+## Build Status
+[![Build Status](https://travis-ci.org/Zimbra/zm-timezones.svg)](https://travis-ci.org/Zimbra/zm-timezones)
