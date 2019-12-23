@@ -10,6 +10,8 @@
   <property name="tz.dir" value="${build.dir}/js"/>
   <property name="tz.file" value="${tz.dir}/AjxTimezoneData.js"/>
   <property name="message.dir" value="${build.dir}/messages"/>
+  <property name="DOCKER_REPO_PUSH_NS" value="zms" />
+  <property name="DOCKER_PUSH_TAG" value="1.0" />
 
   <target name="zip" depends="timezones" description="Creates the zip file">
     <zip destfile="${build.dir}/${ant.project.name}-${git.timestamp}.zip" update="true" basedir="${build.dir}" excludes="${ant.project.name}-${git.timestamp}.zip" />
@@ -44,5 +46,19 @@
     <delete dir="build/dist"/>
     <delete dir="build/stage"/>
     <exec dir="." executable="./pkg-builder.pl" failonerror="true"/>
+  </target>
+  <target name="build-image">
+    <exec executable="docker">
+      <arg value="build" />
+      <arg value="-t" />
+      <arg value="${DOCKER_REPO_PUSH_NS}/zms-timezones:${DOCKER_PUSH_TAG}" />
+      <arg value="." />
+    </exec>
+  </target>
+  <target name="push-image" depends="build-image">
+    <exec executable="docker">
+      <arg value="push" />
+      <arg value="${DOCKER_REPO_PUSH_NS}/zms-timezones:${DOCKER_PUSH_TAG}" />
+    </exec>
   </target>
 </project>
