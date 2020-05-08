@@ -96,6 +96,13 @@ jobs:
          - image: zimbra/zm-base-os:devcore-ubuntu-12.04
       <<: *build_job_steps
 
+   build_c8:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-centos-8
+      <<: *build_job_steps
+
    build_c7:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
@@ -153,6 +160,9 @@ workflows:
          - build_u12:
             requires:
                - sanity
+         - build_c8:
+            requires:
+               - sanity
          - build_c7:
             requires:
                - sanity
@@ -166,6 +176,7 @@ workflows:
                - build_u16
                - build_u14
                - build_u12
+               - build_c8
                - build_c7
                - build_c6
             <<: *std_filters
