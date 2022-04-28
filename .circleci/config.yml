@@ -141,7 +141,7 @@ jobs:
    sanity:
       working_directory: ~/zm-timezones
       docker:
-         - image: circleci/python:2.7
+         - image: cimg/python:2.7
       steps:
          - attach_workspace:
             at: ..
