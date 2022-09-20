@@ -45,4 +45,28 @@
     <delete dir="build/stage"/>
     <exec dir="." executable="./pkg-builder.pl" failonerror="true"/>
   </target>
+
+  <property name="DOCKER_REPO_PUSH_NS" value="zimbra" />
+  <property name="DOCKER_BUILD_TAG" value="2.0.0" />
+  <property name="DOCKER_PUSH_TAG" value="${DOCKER_BUILD_TAG}" />
+
+  <target name="build-image" depends="timezones">
+    <exec executable="docker" failonerror="true">
+      <arg value="build" />
+      <arg value="--build-arg" />
+      <arg value="DOCKER_REPO_NS=${DOCKER_REPO_PUSH_NS}" />
+      <arg value="--cache-from" />
+      <arg value="${DOCKER_REPO_PUSH_NS}/zms-timezones:${DOCKER_BUILD_TAG}" />
+      <arg value="--tag" />
+      <arg value="${DOCKER_REPO_PUSH_NS}/zms-timezones:${DOCKER_BUILD_TAG}" />
+      <arg value="." />
+    </exec>
+  </target>
+
+  <target name="push-image" depends="build-image">
+    <exec executable="docker" failonerror="true">
+        <arg value="push" />
+        <arg value="${DOCKER_REPO_PUSH_NS}/zms-timezones:${DOCKER_PUSH_TAG}" />
+    </exec>
+  </target>
 </project>
