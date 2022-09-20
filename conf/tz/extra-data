@@ -145,6 +145,7 @@ PrimaryZone	Asia/Qyzylorda
 # on 2014-12-28 at 02:00.  They call UTC+11 "Bougainville Standard Time";
 PrimaryZone	Pacific/Bougainville
 PrimaryZone	Africa/Juba
+PrimaryZone	Africa/Ceuta
 PrimaryZone	America/Whitehorse
 
 
