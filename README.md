@@ -47,33 +47,49 @@ directory.  As of October 2014, these were obtainable from:
 <http://www.iana.org/time-zones> The latest version at that date was
 `tzdata2014i.tar.gz`  A full list of *all* Olson tzdata files are available [here](ftp://ftp.iana.org/tz/releases/).
 3. Update the URL contained in the file `tz-src-url.txt` with the URL of the file that you downloaded.
-3. Extract the data from these archives into the `tzdata` sub-directory.
+4. Extract the data from these archives into the `tzdata` sub-directory.
    (substitute the correct letters for **?????** in this command)
 
 		$ rm -rf tzdata;mkdir tzdata;tar zxvpf tzdata?????.tar.gz -C tzdata
-4. Update the `windows-names` file based on the latest time zone names used in
+5. Update the `windows-names` file based on the latest time zone names used in
    Windows operating system(s). (more on this later)
-5. Update the `extra-data` file accordingly after updating windows-names.
+6. Update the `extra-data` file accordingly after updating windows-names.
    (more on this later)
-6. Run the generator.
+7. Run the generator.
 
 		$ ./zmtzdata2ical -o timezones.ics --old-timezones-file ../timezones.ics -e extra-data -t tzdata windows-names
 
    For information on other options, use `zmtzdata2ical --help`
-7. Review the generated `timezones.ics` and make any fixes as necessary.  There
+   
+   If you get an error like below arising out of files in `tzdata` folder(`calendars`, `version`, `theory.html`, `SECURITY`) then you can delete these files and try running the generator again.
+   ```
+   Invalid line type
+   Line: 1
+   File: /repo/zm-timezones/conf/tz/tzdata/calendars
+   java.text.ParseException: Invalid line type
+   at com.zimbra.common.calendar.ZoneInfoParser.readTzdata(ZoneInfoParser.java:973)
+   at com.zimbra.common.calendar.ZoneInfo2iCalendar.main(ZoneInfo2iCalendar.java:1199)
+   ```
+
+   If you get an error like below, it can be ignored as the .ics file still gets successfully generated.
+   ```
+   Problem loading old timezones.ics - ignoring it.  An error ocurred during parsing - line: 3436
+   ```
+
+8. Review the generated `timezones.ics` and make any fixes as necessary.  There
    may be errors in the generated file because of bugs in the generator utility
    or the data files themselves.  Look at the diff from the previous version of
    timezones.ics and compare the changes against the published time zone policy
    changes.
-8. Convert the generated `timezones.ics` from using `\r\n` line endings to `\n`
+9. Convert the generated `timezones.ics` from using `\r\n` line endings to `\n`
    line endings (Although `\r\n` endings are technically more correct for
    `.ics` files, some tools, such as `zmsetup.pl` require `\n` line endings)
 
 		$ perl -i.org -pe 's/\r\n/\n/' timezones.ics
 		$ mv timezones.ics ../timezones.ics
-9. Re-build Zimbra and run tests.  e.g.  Check that can change the time zone
+10. Re-build Zimbra and run tests.  e.g.  Check that can change the time zone
    associated with a user in ZWC preferences.
-10. Commit changes to `ZimbraServer/conf/timezone.ics`,
+11. Commit changes to `ZimbraServer/conf/timezone.ics`,
     `ZimbraServer/conf/tz/windows-names` and `ZimbraServer/conf/tz/extra-data`.
 
 ## The windows-names File
@@ -123,7 +139,10 @@ To get a report of what needs changing do:
 ```
 (cd tools && ./updateWindowsNames.py)
 ```
-
+Or if you have python v3 installed, you can navigate to `tools` directory and run:
+```
+py -2.7 .\updateWindowsNames.py
+```
 Note that TZIDs used in Windows originated ICAL tend to have UTC offsets with
 "." instead of ":" in the name, which differs from what is in
 `tools/WindowsTimeZoneInfo.txt`
@@ -159,7 +178,10 @@ To do a sanity check on whether this section needs additional entries, do:
 ```
 (cd tools && ./checkPrimaryZones.py)
 ```
-
+Or if you have python v3 installed, you can navigate to `tools` directory and run:
+```
+py -2.7 .\checkPrimaryZones.py
+```
 Note that `messages/TzMsg.properties` will need updating for any changes to
 the PrimaryZone section.  Also, if any UTC offsets are mentioned in the values
 for timezones listed in that file and those have changed, those should be
