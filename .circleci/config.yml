@@ -72,70 +72,120 @@ jobs:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:core-ubuntu
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *checkout_job_steps
+
+   build_u22:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
+      <<: *build_job_steps
 
    build_u20:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-20.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u18:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-18.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u16:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-16.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-16.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u14:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-14.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-14.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u12:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-12.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-12.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
+      <<: *build_job_steps
+
+   build_c9:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_c8:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-centos-8
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_c7:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-centos-7
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_c6:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-centos-6
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-6
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    deploy_s3:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:core-ubuntu
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *deploy_s3_job_steps
 
    sanity:
@@ -160,44 +210,75 @@ workflows:
    version: 2
    main:
       jobs:
-         - checkout
+         - checkout:
+            context:
+               - docker-dev-registry
+
          - sanity:
             requires:
                - checkout
 
+         - build_u22:
+            requires:
+               - sanity
+            context:
+               - docker-dev-registry
          - build_u20:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_u18:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_u16:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_u14:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_u12:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
+         - build_c9:
+            requires:
+               - sanity
+            context:
+               - docker-dev-registry
          - build_c8:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_c7:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
          - build_c6:
             requires:
                - sanity
+            context:
+               - docker-dev-registry
 
          - deploy_s3_hold:
             type: approval
             requires:
+               - build_u22
                - build_u20
                - build_u18
                - build_u16
                - build_u14
                - build_u12
+               - build_c9
                - build_c8
                - build_c7
                - build_c6
