@@ -901,85 +901,6 @@ ID: Argentina Standard Time
       Delta: 01:00:00
       Begins at 00:00 on Thursday of week 1 of January
       Ends at 23:59 on Saturday of week 2 of March
-ID: Greenland Standard Time
-   Display Name:                    (UTC-03:00) Greenland
-   Standard Name:                 Greenland Standard Time
-   Daylight Name:                 Greenland Daylight Time   ***Has Daylight Saving Time***
-   Offset from UTC:                      -3 hours, 0 minutes
-   Number of adjustment rules:                         18
-   Adjustment Rules:
-      From 01/01/0001 00:00:00 to 31/12/2004 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2005 00:00:00 to 31/12/2005 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2006 00:00:00 to 31/12/2006 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2007 00:00:00 to 31/12/2007 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 4 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2008 00:00:00 to 31/12/2008 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2009 00:00:00 to 31/12/2009 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 4 of October
-      From 01/01/2010 00:00:00 to 31/12/2010 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2011 00:00:00 to 31/12/2011 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2012 00:00:00 to 31/12/2012 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 4 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2013 00:00:00 to 31/12/2013 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2014 00:00:00 to 31/12/2014 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2015 00:00:00 to 31/12/2015 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 4 of October
-      From 01/01/2016 00:00:00 to 31/12/2016 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2017 00:00:00 to 31/12/2017 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2018 00:00:00 to 31/12/2018 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 4 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2019 00:00:00 to 31/12/2019 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
-      From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 4 of October
-      From 01/01/2021 00:00:00 to 31/12/9999 00:00:00
-      Delta: 01:00:00
-      Begins at 22:00 on Saturday of week 5 of March
-      Ends at 23:00 on Saturday of week 5 of October
 ID: Montevideo Standard Time
    Display Name:                   (UTC-03:00) Montevideo
    Standard Name:                Montevideo Standard Time
@@ -1074,6 +995,97 @@ ID: UTC-02
    Daylight Name:                                  UTC-02   ***Does Not Have Daylight Saving Time***
    Offset from UTC:                      -2 hours, 0 minutes
    Number of adjustment rules:                          0
+ID: Greenland Standard Time
+   Display Name:                    (UTC-02:00) Greenland
+   Standard Name:                 Greenland Standard Time
+   Daylight Name:                 Greenland Daylight Time   ***Has Daylight Saving Time***
+   Offset from UTC:                      -2 hours, 0 minutes
+   Number of adjustment rules:                         21
+   Adjustment Rules:
+      From 01/01/0001 00:00:00 to 31/12/2004 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2005 00:00:00 to 31/12/2005 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2006 00:00:00 to 31/12/2006 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2007 00:00:00 to 31/12/2007 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 4 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2008 00:00:00 to 31/12/2008 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2009 00:00:00 to 31/12/2009 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 4 of October
+      From 01/01/2010 00:00:00 to 31/12/2010 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2011 00:00:00 to 31/12/2011 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2012 00:00:00 to 31/12/2012 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 4 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2013 00:00:00 to 31/12/2013 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2014 00:00:00 to 31/12/2014 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2015 00:00:00 to 31/12/2015 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 4 of October
+      From 01/01/2016 00:00:00 to 31/12/2016 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2017 00:00:00 to 31/12/2017 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2018 00:00:00 to 31/12/2018 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 4 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2019 00:00:00 to 31/12/2019 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 4 of October
+      From 01/01/2021 00:00:00 to 31/12/2021 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2022 00:00:00 to 31/12/2022 00:00:00
+      Delta: 01:00:00
+      Begins at 22:00 on Saturday of week 5 of March
+      Ends at 23:00 on Saturday of week 5 of October
+      From 01/01/2023 00:00:00 to 31/12/2023 00:00:00
+      Delta: -01:00:00
+      Begins at 00:00 on Sunday of week 1 of January
+      Ends at 22:00 on Saturday of week 5 of March
+      From 01/01/2024 00:00:00 to 31/12/9999 00:00:00
+      Delta: 01:00:00
+      Begins at 23:00 on Saturday of week 5 of March
+      Ends at 00:00 on Sunday of week 5 of October
 ID: Mid-Atlantic Standard Time
    Display Name:           (UTC-02:00) Mid-Atlantic - Old
    Standard Name:              Mid-Atlantic Standard Time
@@ -1405,103 +1417,12 @@ ID: E. Europe Standard Time
       Delta: 01:00:00
       Begins at 02:00 on Sunday of week 5 of March
       Ends at 03:00 on Sunday of week 5 of October
-ID: Syria Standard Time
-   Display Name:                     (UTC+02:00) Damascus
-   Standard Name:                     Syria Standard Time
-   Daylight Name:                     Syria Daylight Time   ***Has Daylight Saving Time***
-   Offset from UTC:                       2 hours, 0 minutes
-   Number of adjustment rules:                         21
-   Adjustment Rules:
-      From 01/01/0001 00:00:00 to 31/12/2004 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Thursday of week 1 of April
-      Ends at 23:59 on Thursday of week 5 of September
-      From 01/01/2005 00:00:00 to 31/12/2005 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 1 of April
-      Ends at 23:59 on Friday of week 5 of September
-      From 01/01/2006 00:00:00 to 31/12/2006 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Saturday of week 1 of April
-      Ends at 23:59 on Thursday of week 3 of September
-      From 01/01/2007 00:00:00 to 31/12/2007 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 1 of November
-      From 01/01/2008 00:00:00 to 31/12/2008 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 1 of April
-      Ends at 23:59 on Friday of week 5 of October
-      From 01/01/2009 00:00:00 to 31/12/2009 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2010 00:00:00 to 31/12/2010 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 1 of April
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2011 00:00:00 to 31/12/2011 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 1 of April
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2012 00:00:00 to 31/12/2012 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2013 00:00:00 to 31/12/2013 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 4 of October
-      From 01/01/2014 00:00:00 to 31/12/2014 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2015 00:00:00 to 31/12/2015 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2016 00:00:00 to 31/12/2016 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2017 00:00:00 to 31/12/2017 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2018 00:00:00 to 31/12/2018 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2019 00:00:00 to 31/12/2019 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 4 of October
-      From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2021 00:00:00 to 31/12/2021 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2022 00:00:00 to 31/12/2022 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2023 00:00:00 to 31/12/2023 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 5 of October
-      From 01/01/2024 00:00:00 to 31/12/9999 00:00:00
-      Delta: 01:00:00
-      Begins at 00:00 on Friday of week 5 of March
-      Ends at 00:00 on Friday of week 4 of October
 ID: West Bank Standard Time
    Display Name:                 (UTC+02:00) Gaza, Hebron
    Standard Name:            West Bank Gaza Standard Time
    Daylight Name:            West Bank Gaza Daylight Time   ***Has Daylight Saving Time***
    Offset from UTC:                       2 hours, 0 minutes
-   Number of adjustment rules:                          8
+   Number of adjustment rules:                         19
    Adjustment Rules:
       From 01/01/0001 00:00:00 to 31/12/2012 00:00:00
       Delta: 01:00:00
@@ -1517,8 +1438,8 @@ ID: West Bank Standard Time
       Ends at 23:59 on Thursday of week 4 of October
       From 01/01/2015 00:00:00 to 31/12/2015 00:00:00
       Delta: 01:00:00
-      Begins at 23:59 on Friday of week 5 of March
-      Ends at 23:59 on Thursday of week 4 of October
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Friday of week 4 of October
       From 01/01/2016 00:00:00 to 31/12/2016 00:00:00
       Delta: 01:00:00
       Begins at 01:00 on Saturday of week 5 of March
@@ -1531,10 +1452,54 @@ ID: West Bank Standard Time
       Delta: 01:00:00
       Begins at 01:00 on Saturday of week 4 of March
       Ends at 01:00 on Saturday of week 5 of October
-      From 01/01/2019 00:00:00 to 31/12/9999 00:00:00
+      From 01/01/2019 00:00:00 to 31/12/2019 00:00:00
       Delta: 01:00:00
       Begins at 00:00 on Friday of week 5 of March
       Ends at 00:00 on Saturday of week 4 of October
+      From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 4 of March
+      Ends at 01:00 on Saturday of week 4 of October
+      From 01/01/2021 00:00:00 to 31/12/2021 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2022 00:00:00 to 31/12/2022 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2023 00:00:00 to 31/12/2023 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2024 00:00:00 to 31/12/2024 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2025 00:00:00 to 31/12/2025 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2026 00:00:00 to 31/12/2026 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 4 of October
+      From 01/01/2027 00:00:00 to 31/12/2027 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2028 00:00:00 to 31/12/2028 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2029 00:00:00 to 31/12/2029 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 4 of March
+      Ends at 01:00 on Saturday of week 5 of October
+      From 01/01/2030 00:00:00 to 31/12/9999 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 5 of March
+      Ends at 01:00 on Saturday of week 5 of October
 ID: South Africa Standard Time
    Display Name:             (UTC+02:00) Harare, Pretoria
    Standard Name:              South Africa Standard Time
@@ -1642,7 +1607,7 @@ ID: Israel Standard Time
       From 01/01/2024 00:00:00 to 31/12/9999 00:00:00
       Delta: 01:00:00
       Begins at 02:00 on Friday of week 5 of March
-      Ends at 02:00 on Sunday of week 4 of October
+      Ends at 02:00 on Sunday of week 5 of October
 ID: South Sudan Standard Time
    Display Name:                         (UTC+02:00) Juba
    Standard Name:               South Sudan Standard Time
@@ -1804,6 +1769,89 @@ ID: Arabic Standard Time
       Delta: 01:00:00
       Begins at 03:00 on Sunday of week 1 of April
       Ends at 04:00 on Monday of week 1 of October
+ID: Syria Standard Time
+   Display Name:                     (UTC+03:00) Damascus
+   Standard Name:                     Syria Standard Time
+   Daylight Name:                     Syria Daylight Time   ***Has Daylight Saving Time***
+   Offset from UTC:                       3 hours, 0 minutes
+   Number of adjustment rules:                         19
+   Adjustment Rules:
+      From 01/01/0001 00:00:00 to 31/12/2004 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Thursday of week 1 of April
+      Ends at 23:59 on Thursday of week 5 of September
+      From 01/01/2005 00:00:00 to 31/12/2005 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 1 of April
+      Ends at 23:59 on Friday of week 5 of September
+      From 01/01/2006 00:00:00 to 31/12/2006 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Saturday of week 1 of April
+      Ends at 23:59 on Thursday of week 3 of September
+      From 01/01/2007 00:00:00 to 31/12/2007 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 1 of November
+      From 01/01/2008 00:00:00 to 31/12/2008 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 1 of April
+      Ends at 23:59 on Friday of week 5 of October
+      From 01/01/2009 00:00:00 to 31/12/2009 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2010 00:00:00 to 31/12/2010 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 1 of April
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2011 00:00:00 to 31/12/2011 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 1 of April
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2012 00:00:00 to 31/12/2012 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2013 00:00:00 to 31/12/2013 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 4 of October
+      From 01/01/2014 00:00:00 to 31/12/2014 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2015 00:00:00 to 31/12/2015 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2016 00:00:00 to 31/12/2016 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2017 00:00:00 to 31/12/2017 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2018 00:00:00 to 31/12/2018 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2019 00:00:00 to 31/12/2019 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 4 of October
+      From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2021 00:00:00 to 31/12/2021 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 23:59 on Thursday of week 5 of October
+      From 01/01/2022 00:00:00 to 31/12/2022 00:00:00
+      Delta: 01:00:00
+      Begins at 00:00 on Friday of week 5 of March
+      Ends at 00:00 on Saturday of week 1 of January
 ID: Turkey Standard Time
    Display Name:                     (UTC+03:00) Istanbul
    Standard Name:                    Turkey Standard Time
@@ -1894,7 +1942,7 @@ ID: E. Africa Standard Time
    Offset from UTC:                       3 hours, 0 minutes
    Number of adjustment rules:                          0
 ID: Volgograd Standard Time
-   Display Name:                    (UTC+04:00) Volgograd
+   Display Name:                    (UTC+03:00) Volgograd
    Standard Name:                 Volgograd Standard Time
    Daylight Name:                 Volgograd Daylight Time   ***Has Daylight Saving Time***
    Offset from UTC:                       3 hours, 0 minutes
@@ -1929,9 +1977,9 @@ ID: Volgograd Standard Time
       Begins at 00:00 on 1 January
       Ends at 00:00 on 1 January
       From 01/01/2020 00:00:00 to 31/12/2020 00:00:00
-      Delta: 00:00:00
-      Begins at 00:00 on 1 January
-      Ends at 00:00 on 1 January
+      Delta: 01:00:00
+      Begins at 00:00 on Wednesday of week 1 of January
+      Ends at 02:00 on Sunday of week 5 of December
 ID: Iran Standard Time
    Display Name:                       (UTC+03:30) Tehran
    Standard Name:                      Iran Standard Time
