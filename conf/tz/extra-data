@@ -146,6 +146,8 @@ PrimaryZone	Asia/Qyzylorda
 PrimaryZone	Pacific/Bougainville
 PrimaryZone	Africa/Juba
 PrimaryZone	America/Whitehorse
+PrimaryZone	America/Mazatlan
+PrimaryZone	America/Nuuk
 
 
 # Raise the match score of some time zones so they win over other zones with

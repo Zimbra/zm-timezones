@@ -147,6 +147,14 @@ Note that TZIDs used in Windows originated ICAL tend to have UTC offsets with
 "." instead of ":" in the name, which differs from what is in
 `tools/WindowsTimeZoneInfo.txt`
 
+`WindowsTimeZoneInfo.txt` can be created on Windows machine. (Verified on windows 10)
+1. set display language to English on your Windows machine
+2. create a folder `C:\Temp`
+3. go to `conf/tz/tools/` and launch Command Prompt (cmd.exe)
+4. run `c:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe getWindowsTimezoneInfo.cs` to compile the cs file. `getWindowsTimezoneInfo.exe` is generated.
+5. run `getWindowsTimezoneInfo.exe` on command prompt. `WindowsTimeZoneInfo.txt` is created in `C:\Temp`
+6. copy it to `conf/tz/tools/`
+
 
 ## The extra-data File
 
