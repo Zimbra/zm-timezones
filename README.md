@@ -87,9 +87,20 @@ directory.  As of October 2014, these were obtainable from:
 
 		$ perl -i.org -pe 's/\r\n/\n/' timezones.ics
 		$ mv timezones.ics ../timezones.ics
-10. Re-build Zimbra and run tests.  e.g.  Check that can change the time zone
+
+10. As a known issue, `Europe/Dublin` in `timezones.ics` needs to be modified.
+    (Reference: [commit](https://github.com/Zimbra/zm-timezones/commit/e8d9a278ff5daad791d2109d621be3ce2b7f2ec4))  
+    As a temporary solution, it needs to be fixed using `fixICS.pl`. Ideally, backend process of zmtzdata2ical should be fixed.
+    ```
+    $ cd conf/tz/tools/
+    $ perl fixICS.pl -t ../../timezones.ics -o ../../timezones_modified.ics
+    $ diff -u ../../timezones.ics ../../timezones_modified.ics
+    $ cp ../../timezones_modified.ics ../../timezones.ics
+    ```
+
+11. Re-build Zimbra and run tests.  e.g.  Check that can change the time zone
    associated with a user in ZWC preferences.
-11. Commit changes to `ZimbraServer/conf/timezone.ics`,
+12. Commit changes to `ZimbraServer/conf/timezone.ics`,
     `ZimbraServer/conf/tz/windows-names` and `ZimbraServer/conf/tz/extra-data`.
 
 ## The windows-names File
