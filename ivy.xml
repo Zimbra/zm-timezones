@@ -7,7 +7,7 @@
   <artifact name="zm-timezones" type="zip" />
  </publications>
  <dependencies>
-  <dependency org="ant" name="ant" rev="1.6.5"/>
+  <dependency org="org.apache.ant" name="ant" rev="1.10.15"/>
  </dependencies>
 </ivy-module>
 
