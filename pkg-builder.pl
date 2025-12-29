@@ -85,6 +85,8 @@ sub stage_zimbra_timezone_data()
    }
 
    cpy_file( "build/conf/timezones.ics", "$stage_base_dir/opt/zimbra/conf/timezones.ics" );
+   cpy_file( "build/conf/WindowsTimeZoneInfo.txt", "$stage_base_dir/opt/zimbra/conf/WindowsTimeZoneInfo.txt" );
+   cpy_file( "build/conf/windows-names", "$stage_base_dir/opt/zimbra/conf/windows-names" );
 
    return ["."];
 }

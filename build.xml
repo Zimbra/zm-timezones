@@ -7,6 +7,8 @@
   <property name="build.bin.dir" value="${build.dir}/bin"/>
   <property name="deploy.file.name" value="deploy-timezones"/>
   <property name="tz.data" value="conf/timezones.ics"/>
+  <property name="tz.info" value="conf/tz/tools/WindowsTimeZoneInfo.txt"/>
+  <property name="tz.names" value="conf/tz/windows-names"/>
   <property name="tz.dir" value="${build.dir}/js"/>
   <property name="tz.file" value="${tz.dir}/AjxTimezoneData.js"/>
   <property name="message.dir" value="${build.dir}/messages"/>
@@ -38,6 +40,8 @@
 
     <mkdir dir="${build.conf.dir}"/>
     <copy file="${tz.data}" todir="${build.conf.dir}"/>
+    <copy file="${tz.info}" todir="${build.conf.dir}"/>
+    <copy file="${tz.names}" todir="${build.conf.dir}"/>
   </target>
 
   <target name="pkg" depends="timezones">
