@@ -12,6 +12,7 @@
   <property name="tz.dir" value="${build.dir}/js"/>
   <property name="tz.file" value="${tz.dir}/AjxTimezoneData.js"/>
   <property name="message.dir" value="${build.dir}/messages"/>
+  <property name="tz.ext.patch.revision" value="${zimbra.buildinfo.revision}" />
 
   <target name="zip" depends="timezones" description="Creates the zip file">
     <zip destfile="${build.dir}/${ant.project.name}-${git.timestamp}.zip" update="true" basedir="${build.dir}" excludes="${ant.project.name}-${git.timestamp}.zip" />
@@ -47,7 +48,10 @@
   <target name="pkg" depends="timezones">
     <delete dir="build/dist"/>
     <delete dir="build/stage"/>
-    <exec dir="." executable="./pkg-builder.pl" failonerror="true"/>
+    <exec dir="." executable="./pkg-builder.pl" failonerror="true">
+	    <arg value="-r"/>
+	    <arg value="${tz.ext.patch.revision}"/>
+    </exec>
   </target>
 
   <property name="DOCKER_REPO_PUSH_NS" value="zimbra" />

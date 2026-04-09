@@ -10,10 +10,18 @@ use File::Basename;
 use File::Copy;
 use File::Path qw/make_path/;
 use Getopt::Long;
+use Getopt::Std;
 use IPC::Cmd qw/run can_run/;
 use Term::ANSIColor;
 
 my %DEFINES = ();
+
+my $sc_name = basename("$0");
+my $usage   = "usage: $sc_name -r package_release\n";
+our($opt_r);
+getopts('r:');
+die "$usage" if (!$opt_r);
+my $revision = $opt_r;
 
 sub parse_defines()
 {
@@ -62,7 +70,7 @@ my %PKG_GRAPH = (
    "zimbra-timezone-data" => {
       summary    => "Zimbra Timezone Data",
       version    => "4.0.0",
-      revision   => 1,
+      revision   => $revision,
       hard_deps  => [],
       soft_deps  => [],
       other_deps => ["zimbra-core-components"],
