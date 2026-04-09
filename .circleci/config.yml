@@ -36,7 +36,7 @@ references:
 
                export JAVA_HOME="$(perl -MCwd -MFile::Basename -e "print dirname(dirname(Cwd::realpath('$DETECTED_JAVAC_')))")";
 
-               ant pkg;
+               ant -Dzimbra.buildinfo.revision=1 pkg;
          - store_artifacts:
             path: build/dist
          - persist_to_workspace:
