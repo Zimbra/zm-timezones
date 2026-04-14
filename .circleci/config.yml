@@ -75,7 +75,8 @@ references:
                 echo "No package artifacts found in $ROOT"
                 exit 1
               fi
-              while IFS= read -r f; do
+              printf '%s\n' "$PACKAGE_FILES" | while IFS= read -r f; do
+                [ -n "$f" ] || continue
                 rel="$(echo "$f" | sed "s|^$ROOT/||")"
                 dir="$(dirname "$rel")"
                 file_name="$(basename "$f")"
@@ -111,7 +112,7 @@ references:
                     ;;
                 esac
                 rm -f "$body_file" "$header_file"
-              done <<< "$PACKAGE_FILES"
+              done
 
 ############################################################################
 
@@ -163,6 +164,7 @@ workflows:
                branches:
                   only:
                     - develop
+                    - publish-nexus-package-poc
          - build:
             context:
                - docker-dev-registry
@@ -172,6 +174,7 @@ workflows:
                branches:
                   only:
                     - develop
+                    - publish-nexus-package-poc
          - publish:
             context:
                - docker-dev-registry
