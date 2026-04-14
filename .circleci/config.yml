@@ -1,69 +1,117 @@
-version: 2
+version: 2.1
 
 ############################################################################
 
 references:
    checkout_job_steps: &checkout_job_steps
       steps:
-         - checkout
+         - checkout:
+             method: full
          - run:
-            name: Checking out dependencies
+            name: Checking out dependencies.
             command: |
-               git clone https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
+               git clone -b develop --single-branch https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
+               git clone -b ZCS-18921 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
+               git clone -b master --single-branch https://github.com/Zimbra/zimbra-package-stub.git ~/zimbra-package-stub
+               git clone -b develop --single-branch https://github.com/Zimbra/zm-mailbox.git ~/zm-mailbox
                echo "BUILD_NO=$CIRCLE_BUILD_NUM" > config.build
+               mkdir -p ~/.zcs-deps
          - persist_to_workspace:
             root: ..
             paths:
                - zm-timezones
                - zm-pkg-tool
+               - zm-zcs
+               - zimbra-package-stub
+               - zm-mailbox
+               - .zcs-deps
 
    build_job_steps: &build_job_steps
       steps:
          - attach_workspace:
             at: ..
          - run:
-            name: Creating build
+            name: Creating package build
             command: |
-               for pth in $HOME/.zm-dev-tools/*/bin
-               do
-                  if [ -d "$pth" ]
-                  then
-                     export PATH="$PATH:$pth";
-                  fi
-               done
-
-               DETECTED_JAVAC_="$(which /usr/bin/javac 2>/dev/null)";
-
-               export JAVA_HOME="$(perl -MCwd -MFile::Basename -e "print dirname(dirname(Cwd::realpath('$DETECTED_JAVAC_')))")";
-
-               ant pkg;
-         - store_artifacts:
-            path: build/dist
+              mkdir -p /home/build/.ivy2/cache
+              sudo apt-get update
+              sudo apt-get install -y ant-contrib rpm dpkg-dev fakeroot lsb-release debhelper build-essential
+              cp /usr/share/java/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar || true
+              cd ../zm-timezones
+              chmod +x pkg-builder.pl
+              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+              export JAVA_HOME
+              export PATH="$JAVA_HOME/bin:$PATH"
+              ant -Dzimbra.buildinfo.version=10.1.0_GA_1001 clean pkg
          - persist_to_workspace:
             root: ..
-            paths: zm-timezones/build/dist/*
+            paths:
+               - .ivy2
+               - .zcs-deps
+               - zm-timezones/build/dist
 
-   deploy_s3_job_steps: &deploy_s3_job_steps
+   publish_job_steps: &publish_job_steps
       steps:
          - attach_workspace:
             at: ..
-         - deploy:
-            name: Deploying to S3
+         - run:
+            name: Publish package artifacts to Nexus
             command: |
-               # NOTE: We are not using $CIRCLE_BUILD_NUM as its different for each job of the workflow
-               #       Instead, we need $CIRCLE_BUILD_NUM allocated for 'checkout' job, (stored in config.build)
-               BUILD_NO=$(cat config.build | sed -ne '/^BUILD_NO\>/ { s/.*=\s*//p }'); [ ! -z "$BUILD_NO" ] || exit 2;
-
-               aws s3 sync build/dist/ "s3://files.zimbra.com/dev-releases/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH-$BUILD_NO/archives/zimbra-foss/" \
-                  --acl public-read \
-                  --region us-east-1
-
-   std_filters: &std_filters
-      filters:
-         branches:
-            only:
-               - master
-               - develop
+              mkdir -p /home/build/.ivy2/cache
+              sudo apt-get update
+              sudo apt-get install -y curl
+              cd ../zm-timezones
+              : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
+              : "${NEXUS_USER:?NEXUS_USER is required}"
+              : "${NEXUS_PASSWORD:?NEXUS_PASSWORD is required}"
+              ROOT="build/dist"
+              APT_REPO="package-repo-apt"
+              YUM_REPO="package-repo-yum"
+              MODULE_PATH="zimbra/zm-timezones/${CIRCLE_SHA1:-develop}"
+              RAW_BASE="$(printf '%s' "$NEXUS_BASE_URL" | sed 's/#.*$//' | sed 's:/*$::')"
+              API_BASE="$RAW_BASE/service/rest/v1/components"
+              PACKAGE_FILES="$(find "$ROOT" -type f \( -name '*.deb' -o -name '*.rpm' \))"
+              if [ -z "$PACKAGE_FILES" ]; then
+                echo "No package artifacts found in $ROOT"
+                exit 1
+              fi
+              while IFS= read -r f; do
+                rel="$(echo "$f" | sed "s|^$ROOT/||")"
+                dir="$(dirname "$rel")"
+                file_name="$(basename "$f")"
+                body_file="$(mktemp)"
+                header_file="$(mktemp)"
+                case "$f" in
+                  *.deb)
+                    repo="$APT_REPO"
+                    url="$API_BASE?repository=$repo"
+                    http_code="$(curl --silent --show-error --user "$NEXUS_USER:$NEXUS_PASSWORD" --request POST "$url" -F "apt.asset=@$f" --dump-header "$header_file" --output "$body_file" --write-out '%{http_code}' || true)"
+                    ;;
+                  *.rpm)
+                    repo="$YUM_REPO"
+                    yum_dir="$MODULE_PATH/$dir"
+                    url="$API_BASE?repository=$repo"
+                    http_code="$(curl --silent --show-error --user "$NEXUS_USER:$NEXUS_PASSWORD" --request POST "$url" -F "yum.directory=$yum_dir" -F "yum.asset=@$f" -F "yum.asset.filename=$file_name" --dump-header "$header_file" --output "$body_file" --write-out '%{http_code}' || true)"
+                    ;;
+                  *)
+                    rm -f "$body_file" "$header_file"
+                    continue
+                    ;;
+                esac
+                case "$http_code" in
+                  2??)
+                    echo "Upload successful: $file_name (HTTP $http_code)"
+                    ;;
+                  *)
+                    echo "Upload failed for $f (HTTP $http_code)"
+                    [ -s "$header_file" ] && sed -n '1,80p' "$header_file"
+                    [ -s "$body_file" ] && sed -n '1,120p' "$body_file"
+                    rm -f "$body_file" "$header_file"
+                    exit 1
+                    ;;
+                esac
+                rm -f "$body_file" "$header_file"
+              done <<< "$PACKAGE_FILES"
 
 ############################################################################
 
@@ -72,147 +120,35 @@ jobs:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: small
       <<: *checkout_job_steps
 
-   build_u24:
+   build:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-      
-   build_u22:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
       <<: *build_job_steps
 
-   build_u20:
+   publish:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
+      circleci_ip_ranges: true
       docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_u18:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_u16:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-16.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_u14:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-14.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_u12:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-12.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_c9:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_c8:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_c7:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   build_c6:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-6
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *build_job_steps
-
-   deploy_s3:
-      working_directory: ~/zm-timezones
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
-           auth:
-            username: $DOCKER_USER
-            password: $DOCKER_PASS
-      <<: *deploy_s3_job_steps
-
-   sanity:
-      working_directory: ~/zm-timezones
-      docker:
-         - image: cimg/python:2.7
-      steps:
-         - attach_workspace:
-            at: ..
-         - run:
-            name: Primary Zone
-            working_directory: ~/zm-timezones/conf/tz/tools
-            command: ./checkPrimaryZones.py
-         - run:
-            name: Message Check
-            working_directory: ~/zm-timezones/conf/tz/tools
-            command: ./TzMsgCheck.pl -t ../../timezones.ics
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: small
+      <<: *publish_job_steps
 
 ############################################################################
 
@@ -223,83 +159,25 @@ workflows:
          - checkout:
             context:
                - docker-dev-registry
-
-         - sanity:
+            filters:
+               branches:
+                  only:
+                    - develop
+         - build:
+            context:
+               - docker-dev-registry
             requires:
                - checkout
-         - build_u24:
-            requires:
-               - sanity
+            filters:
+               branches:
+                  only:
+                    - develop
+         - publish:
             context:
                - docker-dev-registry
-         - build_u22:
             requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_u20:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_u18:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_u16:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_u14:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_u12:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_c9:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_c8:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_c7:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-         - build_c6:
-            requires:
-               - sanity
-            context:
-               - docker-dev-registry
-
-         - deploy_s3_hold:
-            type: approval
-            requires:
-               - build_u24
-               - build_u22
-               - build_u20
-               - build_u18
-               - build_u16
-               - build_u14
-               - build_u12
-               - build_c9
-               - build_c8
-               - build_c7
-               - build_c6
-            <<: *std_filters
-
-         - deploy_s3:
-            requires:
-               - deploy_s3_hold
-            <<: *std_filters
+               - build
+            filters:
+               branches:
+                 only:
+                   - develop
