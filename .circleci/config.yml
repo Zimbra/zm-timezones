@@ -184,3 +184,4 @@ workflows:
                branches:
                  only:
                    - develop
+                   - publish-nexus-package-poc
