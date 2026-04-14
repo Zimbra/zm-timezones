@@ -59,7 +59,7 @@ references:
             command: |
               mkdir -p /home/build/.ivy2/cache
               sudo apt-get update
-              sudo apt-get install -y curl
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
               cd ../zm-timezones
               : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
               : "${NEXUS_USER:?NEXUS_USER is required}"
@@ -75,7 +75,9 @@ references:
                 echo "No package artifacts found in $ROOT"
                 exit 1
               fi
-              printf '%s\n' "$PACKAGE_FILES" | while IFS= read -r f; do
+              package_list_file="$(mktemp)"
+              printf '%s\n' "$PACKAGE_FILES" > "$package_list_file"
+              while IFS= read -r f; do
                 [ -n "$f" ] || continue
                 rel="$(echo "$f" | sed "s|^$ROOT/||")"
                 dir="$(dirname "$rel")"
@@ -112,7 +114,8 @@ references:
                     ;;
                 esac
                 rm -f "$body_file" "$header_file"
-              done
+              done < "$package_list_file"
+              rm -f "$package_list_file"
 
 ############################################################################
 
