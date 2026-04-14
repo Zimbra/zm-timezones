@@ -168,11 +168,29 @@ workflows:
                   only:
                     - develop
                     - publish-nexus-package-poc
+         - approve_package_build:
+            type: approval
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop
+                    - publish-nexus-package-poc
          - build:
             context:
                - docker-dev-registry
             requires:
-               - checkout
+               - approve_package_build
+            filters:
+               branches:
+                  only:
+                    - develop
+                    - publish-nexus-package-poc
+         - approve_package_publish:
+            type: approval
+            requires:
+               - build
             filters:
                branches:
                   only:
@@ -182,7 +200,7 @@ workflows:
             context:
                - docker-dev-registry
             requires:
-               - build
+               - approve_package_publish
             filters:
                branches:
                  only:
