@@ -10,7 +10,9 @@ references:
             RELEASE_PREFIX="${BUILD_RELEASE_NO}"
             [ -n "$RELEASE_PREFIX" ] || (echo "BUILD_RELEASE_NO is required (example: 10.1.0_GA_)" && exit 1)
             echo "$RELEASE_PREFIX" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' || (echo "BUILD_RELEASE_NO must start with semantic version (example: 10.1.0_GA_)" && exit 1)
+            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
             echo "Using release prefix: $RELEASE_PREFIX"
+            echo "Using build release number: $BUILD_RELEASE_NUMBER"
 
    checkout_job_steps: &checkout_job_steps
       steps:
@@ -53,15 +55,20 @@ references:
               export PATH="$JAVA_HOME/bin:$PATH"
               # Ant runs `javac` in-process (not forked) so we need heap for the compiler too.
               export ANT_OPTS="${ANT_OPTS:-} -Xms512m -Xmx3g"
+              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
               java -version
               javac -version
-              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean publish-local-all
               cd ../zm-timezones
               chmod +x pkg-builder.pl
               JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
               export JAVA_HOME
               export PATH="$JAVA_HOME/bin:$PATH"
-              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean pkg
+              case "${CIRCLE_BRANCH:-}" in
+                develop-snapshot|publish-nexus-package-poc) export PKG_RELEASE="develop-snapshot" ;;
+                *) export PKG_RELEASE="${PKG_RELEASE:-1}" ;;
+              esac
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean pkg
          - persist_to_workspace:
             root: ..
             paths:
@@ -86,9 +93,10 @@ references:
               export PATH="$JAVA_HOME/bin:$PATH"
               # Ant runs `javac` in-process (not forked) so we need heap for the compiler too.
               export ANT_OPTS="${ANT_OPTS:-} -Xms512m -Xmx3g"
+              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
               java -version
               javac -version
-              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean publish-local-all
               cd ../zm-timezones
               : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
               : "${NEXUS_USER:?NEXUS_USER is required}"
@@ -134,11 +142,26 @@ references:
                   2??)
                     echo "Upload successful: $file_name (HTTP $http_code)"
                     ;;
+                  400|409)
+                    response_lc="$(tr '[:upper:]' '[:lower:]' < "$body_file" 2>/dev/null || true)"
+                    case "$response_lc" in
+                      *already*exist*|*cannot*be*updated*|*duplicate*|*conflict*)
+                        echo "Upload skipped (already exists): $file_name (HTTP $http_code)"
+                        ;;
+                      *)
+                        echo "Upload failed for $f (HTTP $http_code)"
+                        [ -s "$header_file" ] && sed -n '1,120p' "$header_file"
+                        [ -s "$body_file" ] && sed -n '1,200p' "$body_file"
+                        rm -f "$body_file" "$header_file" "$package_list_file"
+                        exit 1
+                        ;;
+                    esac
+                    ;;
                   *)
                     echo "Upload failed for $f (HTTP $http_code)"
-                    [ -s "$header_file" ] && sed -n '1,80p' "$header_file"
-                    [ -s "$body_file" ] && sed -n '1,120p' "$body_file"
-                    rm -f "$body_file" "$header_file"
+                    [ -s "$header_file" ] && sed -n '1,120p' "$header_file"
+                    [ -s "$body_file" ] && sed -n '1,200p' "$body_file"
+                    rm -f "$body_file" "$header_file" "$package_list_file"
                     exit 1
                     ;;
                 esac
