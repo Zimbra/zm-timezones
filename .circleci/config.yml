@@ -3,6 +3,15 @@ version: 2.1
 ##########################################################################
 
 references:
+   validate_release_prefix: &validate_release_prefix
+      run:
+         name: Validate release version prefix
+         command: |
+            RELEASE_PREFIX="${BUILD_RELEASE_NO}"
+            [ -n "$RELEASE_PREFIX" ] || (echo "BUILD_RELEASE_NO is required (example: 10.1.0_GA_)" && exit 1)
+            echo "$RELEASE_PREFIX" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' || (echo "BUILD_RELEASE_NO must start with semantic version (example: 10.1.0_GA_)" && exit 1)
+            echo "Using release prefix: $RELEASE_PREFIX"
+
    checkout_job_steps: &checkout_job_steps
       steps:
          - checkout:
@@ -30,6 +39,7 @@ references:
       steps:
          - attach_workspace:
             at: ..
+         - *validate_release_prefix
          - run:
             name: Creating package build
             command: |
@@ -37,12 +47,17 @@ references:
               sudo apt-get update
               sudo apt-get install -y ant-contrib rpm dpkg-dev fakeroot lsb-release debhelper build-essential
               cp /usr/share/java/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar || true
+              cd ../zm-mailbox
+              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+              export JAVA_HOME
+              export PATH="$JAVA_HOME/bin:$PATH"
+              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
               cd ../zm-timezones
               chmod +x pkg-builder.pl
               JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
               export JAVA_HOME
               export PATH="$JAVA_HOME/bin:$PATH"
-              ant -Dzimbra.buildinfo.version=10.1.0_GA_1001 clean pkg
+              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean pkg
          - persist_to_workspace:
             root: ..
             paths:
@@ -54,12 +69,18 @@ references:
       steps:
          - attach_workspace:
             at: ..
+         - *validate_release_prefix
          - run:
             name: Publish package artifacts to Nexus
             command: |
               mkdir -p /home/build/.ivy2/cache
               sudo apt-get update
               sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
+              cd ../zm-mailbox
+              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+              export JAVA_HOME
+              export PATH="$JAVA_HOME/bin:$PATH"
+              ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
               cd ../zm-timezones
               : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
               : "${NEXUS_USER:?NEXUS_USER is required}"
@@ -67,7 +88,7 @@ references:
               ROOT="build/dist"
               APT_REPO="package-repo-apt"
               YUM_REPO="package-repo-yum"
-              MODULE_PATH="zimbra/zm-timezones/${CIRCLE_SHA1:-develop}"
+              MODULE_PATH="zimbra/zm-timezones/${CIRCLE_BRANCH:-develop-snapshot}"
               RAW_BASE="$(printf '%s' "$NEXUS_BASE_URL" | sed 's/#.*$//' | sed 's:/*$::')"
               API_BASE="$RAW_BASE/service/rest/v1/components"
               PACKAGE_FILES="$(find "$ROOT" -type f \( -name '*.deb' -o -name '*.rpm' \))"
@@ -163,46 +184,32 @@ workflows:
          - checkout:
             context:
                - docker-dev-registry
+               - build-number
             filters:
                branches:
                   only:
-                    - develop
+                    - develop-snapshot
                     - publish-nexus-package-poc
-         - approve_package_build:
-            type: approval
+         - build:
+            context:
+               - docker-dev-registry
+               - build-number
             requires:
                - checkout
             filters:
                branches:
                   only:
-                    - develop
-                    - publish-nexus-package-poc
-         - build:
-            context:
-               - docker-dev-registry
-            requires:
-               - approve_package_build
-            filters:
-               branches:
-                  only:
-                    - develop
-                    - publish-nexus-package-poc
-         - approve_package_publish:
-            type: approval
-            requires:
-               - build
-            filters:
-               branches:
-                  only:
-                    - develop
+                    - develop-snapshot
                     - publish-nexus-package-poc
          - publish:
             context:
                - docker-dev-registry
+               - build-number
+               - nexus-artifactory
             requires:
-               - approve_package_publish
+               - build
             filters:
                branches:
                  only:
-                   - develop
+                   - develop-snapshot
                    - publish-nexus-package-poc
