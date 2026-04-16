@@ -84,20 +84,8 @@ references:
          - run:
             name: Publish package artifacts to Nexus
             command: |
-              mkdir -p /home/build/.ivy2/cache
               sudo apt-get update
-              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl openjdk-8-jdk
-              cd ../zm-mailbox
-              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-              export JAVA_HOME
-              export PATH="$JAVA_HOME/bin:$PATH"
-              # Ant runs `javac` in-process (not forked) so we need heap for the compiler too.
-              export ANT_OPTS="${ANT_OPTS:-} -Xms512m -Xmx3g"
-              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
-              java -version
-              javac -version
-              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean publish-local-all
-              cd ../zm-timezones
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
               : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
               : "${NEXUS_USER:?NEXUS_USER is required}"
               : "${NEXUS_PASSWORD:?NEXUS_PASSWORD is required}"
