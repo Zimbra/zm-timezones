@@ -15,6 +15,18 @@ use Term::ANSIColor;
 
 my %DEFINES = ();
 
+sub resolve_pkg_release()
+{
+   my $release = $ENV{PKG_RELEASE};
+   if ( !defined $release || $release eq "" )
+   {
+      my $branch = $ENV{CIRCLE_BRANCH} || "";
+      $release = ( $branch eq "develop-snapshot" ) ? "develop-snapshot" : "1";
+   }
+   $release =~ s/[^A-Za-z0-9._+-]/-/g;
+   return $release;
+}
+
 sub parse_defines()
 {
    Die("wrong commandline options")
@@ -62,7 +74,7 @@ my %PKG_GRAPH = (
    "zimbra-timezone-data" => {
       summary    => "Zimbra Timezone Data",
       version    => "4.0.0",
-      revision   => 1,
+      revision   => resolve_pkg_release(),
       hard_deps  => [],
       soft_deps  => [],
       other_deps => ["zimbra-core-components"],
