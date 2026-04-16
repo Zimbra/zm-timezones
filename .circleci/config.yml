@@ -45,12 +45,14 @@ references:
             command: |
               mkdir -p /home/build/.ivy2/cache
               sudo apt-get update
-              sudo apt-get install -y ant-contrib rpm dpkg-dev fakeroot lsb-release debhelper build-essential
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ant-contrib openjdk-8-jdk rpm dpkg-dev fakeroot lsb-release debhelper build-essential
               cp /usr/share/java/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar || true
               cd ../zm-mailbox
               JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
               export JAVA_HOME
               export PATH="$JAVA_HOME/bin:$PATH"
+              java -version
+              javac -version
               ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
               cd ../zm-timezones
               chmod +x pkg-builder.pl
@@ -75,11 +77,13 @@ references:
             command: |
               mkdir -p /home/build/.ivy2/cache
               sudo apt-get update
-              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl openjdk-8-jdk
               cd ../zm-mailbox
               JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
               export JAVA_HOME
               export PATH="$JAVA_HOME/bin:$PATH"
+              java -version
+              javac -version
               ant -Dzimbra.buildinfo.version=${BUILD_RELEASE_NO}${CIRCLE_BUILD_NUM} clean publish-local-all
               cd ../zm-timezones
               : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
