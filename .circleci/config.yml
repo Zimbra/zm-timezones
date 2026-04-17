@@ -1,19 +1,8 @@
 version: 2.1
 
-##########################################################################
+############################################################################
 
 references:
-   validate_release_prefix: &validate_release_prefix
-      run:
-         name: Validate release version prefix
-         command: |
-            RELEASE_PREFIX="${BUILD_RELEASE_NO}"
-            [ -n "$RELEASE_PREFIX" ] || (echo "BUILD_RELEASE_NO is required (example: 10.1.0_GA_)" && exit 1)
-            echo "$RELEASE_PREFIX" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' || (echo "BUILD_RELEASE_NO must start with semantic version (example: 10.1.0_GA_)" && exit 1)
-            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
-            echo "Using release prefix: $RELEASE_PREFIX"
-            echo "Using build release number: $BUILD_RELEASE_NUMBER"
-
    checkout_job_steps: &checkout_job_steps
       steps:
          - checkout:
@@ -25,7 +14,6 @@ references:
                git clone -b ZCS-18921 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
                git clone -b master --single-branch https://github.com/Zimbra/zimbra-package-stub.git ~/zimbra-package-stub
                git clone -b develop --single-branch https://github.com/Zimbra/zm-mailbox.git ~/zm-mailbox
-               echo "BUILD_NO=$CIRCLE_BUILD_NUM" > config.build
                mkdir -p ~/.zcs-deps
          - persist_to_workspace:
             root: ..
@@ -37,74 +25,100 @@ references:
                - zm-mailbox
                - .zcs-deps
 
-   build_job_steps: &build_job_steps
+   build_job_steps_ubuntu: &build_job_steps_ubuntu
       steps:
          - attach_workspace:
             at: ..
-         - *validate_release_prefix
          - run:
             name: Creating package build
             command: |
               mkdir -p /home/build/.ivy2/cache
-              sudo apt-get update
-              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ant-contrib openjdk-8-jdk rpm dpkg-dev fakeroot lsb-release debhelper build-essential
+              sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ant-contrib
               cp /usr/share/java/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar || true
-              cd ../zm-mailbox
-              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-              export JAVA_HOME
+              export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
               export PATH="$JAVA_HOME/bin:$PATH"
-              # Ant runs `javac` in-process (not forked) so we need heap for the compiler too.
-              export ANT_OPTS="${ANT_OPTS:-} -Xms512m -Xmx3g"
               BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
-              java -version
-              javac -version
+              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
+              export PKG_RELEASE="1~develop-snapshot"
+              BUILDINFO_REVISION="1~develop-snapshot"
+              cd ../zm-mailbox
               ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean publish-local-all
               cd ../zm-timezones
               chmod +x pkg-builder.pl
-              JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-              export JAVA_HOME
-              export PATH="$JAVA_HOME/bin:$PATH"
-              case "${CIRCLE_BRANCH:-}" in
-                develop-snapshot|publish-nexus-package-poc) export PKG_RELEASE="develop-snapshot" ;;
-                *) export PKG_RELEASE="${PKG_RELEASE:-1}" ;;
-              esac
-              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean pkg
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" -Dzimbra.buildinfo.revision="${BUILDINFO_REVISION}" clean pkg
+         - store_artifacts:
+            path: build/dist
          - persist_to_workspace:
             root: ..
-            paths:
-               - .ivy2
-               - .zcs-deps
-               - zm-timezones/build/dist
+            paths: zm-timezones/build/dist/*
+
+   build_job_steps_centos: &build_job_steps_centos
+      steps:
+         - attach_workspace:
+            at: ..
+         - run:
+            name: Creating package build
+            command: |
+              mkdir -p /home/build/.ivy2/cache
+              if command -v yum >/dev/null 2>&1; then
+                command -v ant >/dev/null 2>&1 || sudo yum install -y ant
+              elif command -v dnf >/dev/null 2>&1; then
+                command -v ant >/dev/null 2>&1 || sudo dnf install -y ant
+              else
+                exit 1
+              fi
+              if [ -f /usr/share/java/ant-contrib.jar ]; then
+                cp /usr/share/java/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar
+              elif [ -f /usr/share/ant/lib/ant-contrib.jar ]; then
+                cp /usr/share/ant/lib/ant-contrib.jar ~/.zcs-deps/ant-contrib-1.0b1.jar
+              else
+                curl --fail --location --silent --show-error "https://files.zimbra.com/repository/ant-contrib/ant-contrib-1.0b1.jar" --output ~/.zcs-deps/ant-contrib-1.0b1.jar
+              fi
+              DETECTED_JAVAC="$(command -v javac)"
+              export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$DETECTED_JAVAC")")")"
+              export PATH="$JAVA_HOME/bin:$PATH"
+              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
+              BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
+              export PKG_RELEASE="1_develop_snapshot"
+              BUILDINFO_REVISION="1_develop_snapshot"
+              cd ../zm-mailbox
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" clean publish-local-all
+              cd ../zm-timezones
+              chmod +x pkg-builder.pl
+              ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" -Dzimbra.buildinfo.revision="${BUILDINFO_REVISION}" clean pkg
+         - store_artifacts:
+            path: build/dist
+         - persist_to_workspace:
+            root: ..
+            paths: zm-timezones/build/dist/*
 
    publish_job_steps: &publish_job_steps
       steps:
          - attach_workspace:
             at: ..
-         - *validate_release_prefix
          - run:
             name: Publish package artifacts to Nexus
             command: |
-              sudo apt-get update
-              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
-              : "${NEXUS_BASE_URL:?NEXUS_BASE_URL is required}"
+              mkdir -p /home/build/.ivy2/cache
+              sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
+              : "${NEXUS_HOST:?NEXUS_HOST is required}"
               : "${NEXUS_USER:?NEXUS_USER is required}"
               : "${NEXUS_PASSWORD:?NEXUS_PASSWORD is required}"
               ROOT="build/dist"
               APT_REPO="package-repo-apt"
               YUM_REPO="package-repo-yum"
-              MODULE_PATH="zimbra/zm-timezones/${CIRCLE_BRANCH:-develop-snapshot}"
-              RAW_BASE="$(printf '%s' "$NEXUS_BASE_URL" | sed 's/#.*$//' | sed 's:/*$::')"
+              MODULE_PATH="zimbra"
+              RAW_BASE="$(printf '%s' "${NEXUS_BASE_URL:-$NEXUS_HOST}" | sed 's/#.*$//' | sed 's:/$::')"
               API_BASE="$RAW_BASE/service/rest/v1/components"
               PACKAGE_FILES="$(find "$ROOT" -type f \( -name '*.deb' -o -name '*.rpm' \))"
               if [ -z "$PACKAGE_FILES" ]; then
-                echo "No package artifacts found in $ROOT"
                 exit 1
               fi
               package_list_file="$(mktemp)"
               printf '%s\n' "$PACKAGE_FILES" > "$package_list_file"
               while IFS= read -r f; do
                 [ -n "$f" ] || continue
-                rel="$(echo "$f" | sed "s|^$ROOT/||")"
+                rel="$(printf '%s\n' "$f" | sed "s|^$ROOT/||")"
                 dir="$(dirname "$rel")"
                 file_name="$(basename "$f")"
                 body_file="$(mktemp)"
@@ -127,31 +141,8 @@ references:
                     ;;
                 esac
                 case "$http_code" in
-                  2??)
-                    echo "Upload successful: $file_name (HTTP $http_code)"
-                    ;;
-                  400|409)
-                    response_lc="$(tr '[:upper:]' '[:lower:]' < "$body_file" 2>/dev/null || true)"
-                    case "$response_lc" in
-                      *already*exist*|*cannot*be*updated*|*duplicate*|*conflict*)
-                        echo "Upload skipped (already exists): $file_name (HTTP $http_code)"
-                        ;;
-                      *)
-                        echo "Upload failed for $f (HTTP $http_code)"
-                        [ -s "$header_file" ] && sed -n '1,120p' "$header_file"
-                        [ -s "$body_file" ] && sed -n '1,200p' "$body_file"
-                        rm -f "$body_file" "$header_file" "$package_list_file"
-                        exit 1
-                        ;;
-                    esac
-                    ;;
-                  *)
-                    echo "Upload failed for $f (HTTP $http_code)"
-                    [ -s "$header_file" ] && sed -n '1,120p' "$header_file"
-                    [ -s "$body_file" ] && sed -n '1,200p' "$body_file"
-                    rm -f "$body_file" "$header_file" "$package_list_file"
-                    exit 1
-                    ;;
+                  2??) ;;
+                  *) [ -s "$header_file" ] && sed -n '1,80p' "$header_file"; [ -s "$body_file" ] && sed -n '1,120p' "$body_file"; rm -f "$body_file" "$header_file"; exit 1 ;;
                 esac
                 rm -f "$body_file" "$header_file"
               done < "$package_list_file"
@@ -171,7 +162,18 @@ jobs:
       resource_class: small
       <<: *checkout_job_steps
 
-   build:
+   build_u24:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
+      <<: *build_job_steps_ubuntu
+
+   build_u22:
       working_directory: ~/zm-timezones
       shell: /bin/bash -eo pipefail
       docker:
@@ -179,8 +181,52 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      resource_class: large
-      <<: *build_job_steps
+      resource_class: medium
+      <<: *build_job_steps_ubuntu
+
+   build_u20:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
+      <<: *build_job_steps_ubuntu
+
+   build_u18:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
+      <<: *build_job_steps_ubuntu
+
+   build_c9:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
+      <<: *build_job_steps_centos
+
+   build_c8:
+      working_directory: ~/zm-timezones
+      shell: /bin/bash -eo pipefail
+      docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      resource_class: medium
+      <<: *build_job_steps_centos
 
    publish:
       working_directory: ~/zm-timezones
@@ -191,7 +237,7 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      resource_class: large
+      resource_class: small
       <<: *publish_job_steps
 
 ############################################################################
@@ -209,7 +255,62 @@ workflows:
                   only:
                     - develop-snapshot
                     - publish-nexus-package-poc
-         - build:
+         - build_u24:
+            context:
+               - docker-dev-registry
+               - build-number
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop-snapshot
+                    - publish-nexus-package-poc
+         - build_u22:
+            context:
+               - docker-dev-registry
+               - build-number
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop-snapshot
+                    - publish-nexus-package-poc
+         - build_u20:
+            context:
+               - docker-dev-registry
+               - build-number
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop-snapshot
+                    - publish-nexus-package-poc
+         - build_u18:
+            context:
+               - docker-dev-registry
+               - build-number
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop-snapshot
+                    - publish-nexus-package-poc
+         - build_c9:
+            context:
+               - docker-dev-registry
+               - build-number
+            requires:
+               - checkout
+            filters:
+               branches:
+                  only:
+                    - develop-snapshot
+                    - publish-nexus-package-poc
+         - build_c8:
             context:
                - docker-dev-registry
                - build-number
@@ -226,7 +327,12 @@ workflows:
                - build-number
                - nexus-artifactory
             requires:
-               - build
+               - build_u24
+               - build_u22
+               - build_u20
+               - build_u18
+               - build_c9
+               - build_c8
             filters:
                branches:
                  only:
