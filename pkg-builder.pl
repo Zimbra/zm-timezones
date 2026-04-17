@@ -27,6 +27,19 @@ sub resolve_pkg_release()
    return $release;
 }
 
+sub resolve_pkg_version()
+{
+   my $version = $ENV{BUILD_RELEASE_NO} || "";
+   $version =~ s/_+$//;
+   $version =~ s/_GA$//;
+   $version =~ s/_/./g;
+   if ( $version !~ /^[0-9]+\.[0-9]+\.[0-9]+$/ )
+   {
+      $version = "4.0.0";
+   }
+   return $version;
+}
+
 sub parse_defines()
 {
    Die("wrong commandline options")
@@ -73,7 +86,7 @@ sub git_timestamp_from_dirs($)
 my %PKG_GRAPH = (
    "zimbra-timezone-data" => {
       summary    => "Zimbra Timezone Data",
-      version    => "4.0.0",
+      version    => resolve_pkg_version(),
       revision   => resolve_pkg_release(),
       hard_deps  => [],
       soft_deps  => [],
