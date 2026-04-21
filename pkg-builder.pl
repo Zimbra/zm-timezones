@@ -10,18 +10,35 @@ use File::Basename;
 use File::Copy;
 use File::Path qw/make_path/;
 use Getopt::Long;
-use Getopt::Std;
 use IPC::Cmd qw/run can_run/;
 use Term::ANSIColor;
 
 my %DEFINES = ();
 
-my $sc_name = basename("$0");
-my $usage   = "usage: $sc_name -r package_release\n";
-our($opt_r);
-getopts('r:');
-die "$usage" if (!$opt_r);
-my $revision = $opt_r;
+sub resolve_pkg_release()
+{
+   my $release = $ENV{PKG_RELEASE};
+   if ( !defined $release || $release eq "" )
+   {
+      my $branch = $ENV{CIRCLE_BRANCH} || "";
+      $release = ( $branch eq "develop-snapshot" ) ? "develop-snapshot" : "1";
+   }
+   $release =~ s/[^A-Za-z0-9._+~-]/-/g;
+   return $release;
+}
+
+sub resolve_pkg_version()
+{
+   my $version = $ENV{BUILD_RELEASE_NO} || "";
+   $version =~ s/_+$//;
+   $version =~ s/_GA$//;
+   $version =~ s/_/./g;
+   if ( $version !~ /^[0-9]+\.[0-9]+\.[0-9]+$/ )
+   {
+      $version = "4.0.0";
+   }
+   return $version;
+}
 
 sub parse_defines()
 {
@@ -69,8 +86,8 @@ sub git_timestamp_from_dirs($)
 my %PKG_GRAPH = (
    "zimbra-timezone-data" => {
       summary    => "Zimbra Timezone Data",
-      version    => "4.0.0",
-      revision   => $revision,
+      version    => resolve_pkg_version(),
+      revision   => resolve_pkg_release(),
       hard_deps  => [],
       soft_deps  => [],
       other_deps => ["zimbra-core-components"],
