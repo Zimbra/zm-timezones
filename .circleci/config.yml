@@ -10,7 +10,7 @@ references:
             name: Checking out dependencies.
             command: |
                git clone -b develop --single-branch https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
-               git clone -b ZCS-18921 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
+               git clone -b ZCS-18832 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
                git clone -b master --single-branch https://github.com/Zimbra/zimbra-package-stub.git ~/zimbra-package-stub
                git clone -b develop --single-branch https://github.com/Zimbra/zm-mailbox.git ~/zm-mailbox
                git clone -b master --single-branch https://$GITHUB_ACCESS_TOKEN@github.com/Zimbra/zm-nexus.git ~/zm-nexus
@@ -40,7 +40,6 @@ references:
               export PATH="$JAVA_HOME/bin:$PATH"
               BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
               BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
-              export PKG_RELEASE="1~develop-snapshot"
               BUILDINFO_REVISION="1~develop-snapshot"
               cd ../zm-mailbox
               ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" -Dzimbra.buildinfo.revision="${BUILDINFO_REVISION}" clean publish-local-all
@@ -80,7 +79,6 @@ references:
               export PATH="$JAVA_HOME/bin:$PATH"
               BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
               BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
-              export PKG_RELEASE="1_develop_snapshot"
               BUILDINFO_REVISION="1_develop_snapshot"
               cd ../zm-mailbox
               ant -Dzimbra.buildinfo.version="${BUILD_RELEASE_NUMBER}_${CIRCLE_BUILD_NUM}" -Dzimbra.buildinfo.revision="${BUILDINFO_REVISION}" clean publish-local-all
