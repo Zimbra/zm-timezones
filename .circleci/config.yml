@@ -10,7 +10,7 @@ references:
             name: Checking out dependencies.
             command: |
                git clone -b develop --single-branch https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
-               git clone -b ZCS-18832 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
+               git clone -b develop --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
                git clone -b master --single-branch https://github.com/Zimbra/zimbra-package-stub.git ~/zimbra-package-stub
                git clone -b develop --single-branch https://github.com/Zimbra/zm-mailbox.git ~/zm-mailbox
                git clone -b master --single-branch https://$GITHUB_ACCESS_TOKEN@github.com/Zimbra/zm-nexus.git ~/zm-nexus
@@ -207,7 +207,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_u24:
             context:
@@ -218,7 +217,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_u22:
             context:
@@ -229,7 +227,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_u20:
             context:
@@ -240,7 +237,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_u18:
             context:
@@ -251,7 +247,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_c9:
             context:
@@ -262,7 +257,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - build_c8:
             context:
@@ -273,7 +267,6 @@ workflows:
             filters:
                branches:
                   only:
-                    - ZCS-18921
                     - develop
          - publish:
             context:
@@ -291,5 +284,4 @@ workflows:
             filters:
                branches:
                  only:
-                   - ZCS-18921
                    - develop
